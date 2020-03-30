@@ -1,5 +1,6 @@
 // Copyright (c) 2012 Pieter Wuille
 // Copyright (c) 2012-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -302,9 +303,9 @@ public:
     {
         LOCK(cs);
 
-        unsigned char nVersion = 1;
+        uint8_t nVersion = 1;
         s << nVersion;
-        s << ((unsigned char)32);
+        s << ((uint8_t)32);
         s << nKey;
         s << nNew;
         s << nTried;
@@ -354,9 +355,9 @@ public:
 
         Clear();
 
-        unsigned char nVersion;
+        uint8_t nVersion;
         s >> nVersion;
-        unsigned char nKeySize;
+        uint8_t nKeySize;
         s >> nKeySize;
         if (nKeySize != 32) throw std::ios_base::failure("Incorrect keysize in addrman deserialization");
         s >> nKey;
