@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -38,7 +39,7 @@ bool SerializeFileDB(const std::string& prefix, const fs::path& path, const Data
 {
     // Generate random temporary filename
     unsigned short randv = 0;
-    GetRandBytes((unsigned char*)&randv, sizeof(randv));
+    GetRandBytes((uint8_t *)&randv, sizeof(randv));
     std::string tmpfn = strprintf("%s.%04x", prefix, randv);
 
     // open temp output file, and associate with CAutoFile
@@ -66,7 +67,7 @@ bool DeserializeDB(Stream& stream, Data& data, bool fCheckSum = true)
     try {
         CHashVerifier<Stream> verifier(&stream);
         // de-serialize file header (network specific magic number) and ..
-        unsigned char pchMsgTmp[4];
+        uint8_t pchMsgTmp[4];
         verifier >> FLATDATA(pchMsgTmp);
         // ... verify the network matches ours
         if (memcmp(pchMsgTmp, Params().MessageStart(), sizeof(pchMsgTmp)))
