@@ -1,4 +1,5 @@
 // Copyright (c) 2014-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -18,7 +19,7 @@
 /** All alphanumeric characters except for "0", "I", "O", and "l" */
 static const char* pszBase58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
-bool DecodeBase58(const char* psz, std::vector<unsigned char>& vch)
+bool DecodeBase58(const char* psz, std::vector<uint8_t>& vch)
 {
     // Skip leading spaces.
     while (*psz && isspace(*psz))
@@ -32,7 +33,7 @@ bool DecodeBase58(const char* psz, std::vector<unsigned char>& vch)
     }
     // Allocate enough space in big-endian base256 representation.
     int size = strlen(psz) * 733 /1000 + 1; // log(58) / log(256), rounded up.
-    std::vector<unsigned char> b256(size);
+    std::vector<uint8_t> b256(size);
     // Process the characters.
     while (*psz && !isspace(*psz)) {
         // Decode base58 character
@@ -42,7 +43,7 @@ bool DecodeBase58(const char* psz, std::vector<unsigned char>& vch)
         // Apply "b256 = b256 * 58 + ch".
         int carry = ch - pszBase58;
         int i = 0;
-        for (std::vector<unsigned char>::reverse_iterator it = b256.rbegin(); (carry != 0 || i < length) && (it != b256.rend()); ++it, ++i) {
+        for (std::vector<uint8_t>::reverse_iterator it = b256.rbegin(); (carry != 0 || i < length) && (it != b256.rend()); ++it, ++i) {
             carry += 58 * (*it);
             *it = carry % 256;
             carry /= 256;
@@ -57,7 +58,7 @@ bool DecodeBase58(const char* psz, std::vector<unsigned char>& vch)
     if (*psz != 0)
         return false;
     // Skip leading zeroes in b256.
-    std::vector<unsigned char>::iterator it = b256.begin() + (size - length);
+    std::vector<uint8_t>::iterator it = b256.begin() + (size - length);
     while (it != b256.end() && *it == 0)
         it++;
     // Copy result into output vector.
@@ -68,7 +69,7 @@ bool DecodeBase58(const char* psz, std::vector<unsigned char>& vch)
     return true;
 }
 
-std::string EncodeBase58(const unsigned char* pbegin, const unsigned char* pend)
+std::string EncodeBase58(const uint8_t *pbegin, const uint8_t *pend)
 {
     // Skip & count leading zeroes.
     int zeroes = 0;
@@ -79,13 +80,13 @@ std::string EncodeBase58(const unsigned char* pbegin, const unsigned char* pend)
     }
     // Allocate enough space in big-endian base58 representation.
     int size = (pend - pbegin) * 138 / 100 + 1; // log(256) / log(58), rounded up.
-    std::vector<unsigned char> b58(size);
+    std::vector<uint8_t> b58(size);
     // Process the bytes.
     while (pbegin != pend) {
         int carry = *pbegin;
         int i = 0;
         // Apply "b58 = b58 * 256 + ch".
-        for (std::vector<unsigned char>::reverse_iterator it = b58.rbegin(); (carry != 0 || i < length) && (it != b58.rend()); it++, i++) {
+        for (std::vector<uint8_t>::reverse_iterator it = b58.rbegin(); (carry != 0 || i < length) && (it != b58.rend()); it++, i++) {
             carry += 256 * (*it);
             *it = carry % 58;
             carry /= 58;
@@ -96,7 +97,7 @@ std::string EncodeBase58(const unsigned char* pbegin, const unsigned char* pend)
         pbegin++;
     }
     // Skip leading zeroes in base58 result.
-    std::vector<unsigned char>::iterator it = b58.begin() + (size - length);
+    std::vector<uint8_t>::iterator it = b58.begin() + (size - length);
     while (it != b58.end() && *it == 0)
         it++;
     // Translate the result into a string.
@@ -108,26 +109,26 @@ std::string EncodeBase58(const unsigned char* pbegin, const unsigned char* pend)
     return str;
 }
 
-std::string EncodeBase58(const std::vector<unsigned char>& vch)
+std::string EncodeBase58(const std::vector<uint8_t>& vch)
 {
     return EncodeBase58(vch.data(), vch.data() + vch.size());
 }
 
-bool DecodeBase58(const std::string& str, std::vector<unsigned char>& vchRet)
+bool DecodeBase58(const std::string& str, std::vector<uint8_t>& vchRet)
 {
     return DecodeBase58(str.c_str(), vchRet);
 }
 
-std::string EncodeBase58Check(const std::vector<unsigned char>& vchIn)
+std::string EncodeBase58Check(const std::vector<uint8_t>& vchIn)
 {
     // add 4-byte hash check to the end
-    std::vector<unsigned char> vch(vchIn);
+    std::vector<uint8_t> vch(vchIn);
     uint256 hash = Hash(vch.begin(), vch.end());
-    vch.insert(vch.end(), (unsigned char*)&hash, (unsigned char*)&hash + 4);
+    vch.insert(vch.end(), (uint8_t *)&hash, (uint8_t *)&hash + 4);
     return EncodeBase58(vch);
 }
 
-bool DecodeBase58Check(const char* psz, std::vector<unsigned char>& vchRet)
+bool DecodeBase58Check(const char* psz, std::vector<uint8_t>& vchRet)
 {
     if (!DecodeBase58(psz, vchRet) ||
         (vchRet.size() < 4)) {
@@ -144,7 +145,7 @@ bool DecodeBase58Check(const char* psz, std::vector<unsigned char>& vchRet)
     return true;
 }
 
-bool DecodeBase58Check(const std::string& str, std::vector<unsigned char>& vchRet)
+bool DecodeBase58Check(const std::string& str, std::vector<uint8_t>& vchRet)
 {
     return DecodeBase58Check(str.c_str(), vchRet);
 }
@@ -155,7 +156,7 @@ CBase58Data::CBase58Data()
     vchData.clear();
 }
 
-void CBase58Data::SetData(const std::vector<unsigned char>& vchVersionIn, const void* pdata, size_t nSize)
+void CBase58Data::SetData(const std::vector<uint8_t>& vchVersionIn, const void* pdata, size_t nSize)
 {
     vchVersion = vchVersionIn;
     vchData.resize(nSize);
@@ -163,14 +164,14 @@ void CBase58Data::SetData(const std::vector<unsigned char>& vchVersionIn, const 
         memcpy(vchData.data(), pdata, nSize);
 }
 
-void CBase58Data::SetData(const std::vector<unsigned char>& vchVersionIn, const unsigned char* pbegin, const unsigned char* pend)
+void CBase58Data::SetData(const std::vector<uint8_t>& vchVersionIn, const uint8_t *pbegin, const uint8_t *pend)
 {
     SetData(vchVersionIn, (void*)pbegin, pend - pbegin);
 }
 
 bool CBase58Data::SetString(const char* psz, unsigned int nVersionBytes)
 {
-    std::vector<unsigned char> vchTemp;
+    std::vector<uint8_t> vchTemp;
     bool rc58 = DecodeBase58Check(psz, vchTemp);
     if ((!rc58) || (vchTemp.size() < nVersionBytes)) {
         vchData.clear();
@@ -192,7 +193,7 @@ bool CBase58Data::SetString(const std::string& str)
 
 std::string CBase58Data::ToString() const
 {
-    std::vector<unsigned char> vch = vchVersion;
+    std::vector<uint8_t> vch = vchVersion;
     vch.insert(vch.end(), vchData.begin(), vchData.end());
     return EncodeBase58Check(vch);
 }
