@@ -1,4 +1,5 @@
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -425,7 +426,7 @@ static void MutateTxAddOutData(CMutableTransaction& tx, const std::string& strIn
     if (!IsHex(strData))
         throw std::runtime_error("invalid TX output data");
 
-    std::vector<unsigned char> data = ParseHex(strData);
+    std::vector<uint8_t> data = ParseHex(strData);
 
     CTxOut txout(value, CScript() << OP_RETURN << data);
     tx.vout.push_back(txout);
@@ -602,7 +603,7 @@ static void MutateTxSign(CMutableTransaction& tx, const std::string& flagStr)
                 throw std::runtime_error("vout must be positive");
 
             COutPoint out(txid, nOut);
-            std::vector<unsigned char> pkData(ParseHexUV(prevOut["scriptPubKey"], "scriptPubKey"));
+            std::vector<uint8_t> pkData(ParseHexUV(prevOut["scriptPubKey"], "scriptPubKey"));
             CScript scriptPubKey(pkData.begin(), pkData.end());
 
             {
@@ -628,7 +629,7 @@ static void MutateTxSign(CMutableTransaction& tx, const std::string& flagStr)
             if ((scriptPubKey.IsPayToScriptHash() || scriptPubKey.IsPayToWitnessScriptHash()) &&
                 prevOut.exists("redeemScript")) {
                 UniValue v = prevOut["redeemScript"];
-                std::vector<unsigned char> rsData(ParseHexUV(v, "redeemScript"));
+                std::vector<uint8_t> rsData(ParseHexUV(v, "redeemScript"));
                 CScript redeemScript(rsData.begin(), rsData.end());
                 tempKeystore.AddCScript(redeemScript);
             }
@@ -640,7 +641,7 @@ static void MutateTxSign(CMutableTransaction& tx, const std::string& flagStr)
     bool fHashSingle = ((nHashType & ~SIGHASH_ANYONECANPAY) == SIGHASH_SINGLE);
 
     // Sign what we can:
-    for (unsigned int i = 0; i < mergedTx.vin.size(); i++) {
+    for (size_t i = 0; i < mergedTx.vin.size(); i++) {
         CTxIn& txin = mergedTx.vin[i];
         const Coin& coin = view.AccessCoin(txin.prevout);
         if (coin.IsSpent()) {
