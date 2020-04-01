@@ -1,4 +1,5 @@
 // Copyright (c) 2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -31,7 +32,7 @@ void CBlockHeaderAndShortTxIDs::FillShortTxIDSelector() const {
     CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
     stream << header << nonce;
     CSHA256 hasher;
-    hasher.Write((unsigned char*)&(*stream.begin()), stream.end() - stream.begin());
+    hasher.Write((uint8_t *)&(*stream.begin()), stream.end() - stream.begin());
     uint256 shorttxidhash;
     hasher.Finalize(shorttxidhash.begin());
     shorttxidk0 = shorttxidhash.GetUint64(0);
