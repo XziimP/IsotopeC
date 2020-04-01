@@ -1,4 +1,5 @@
 // Copyright (c) 2012-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -44,14 +45,14 @@ enum bloomflags
 class CBloomFilter
 {
 private:
-    std::vector<unsigned char> vData;
+    std::vector<uint8_t> vData;
     bool isFull;
     bool isEmpty;
     unsigned int nHashFuncs;
     unsigned int nTweak;
-    unsigned char nFlags;
+    uint8_t nFlags;
 
-    unsigned int Hash(unsigned int nHashNum, const std::vector<unsigned char>& vDataToHash) const;
+    unsigned int Hash(unsigned int nHashNum, const std::vector<uint8_t>& vDataToHash) const;
 
     // Private constructor for CRollingBloomFilter, no restrictions on size
     CBloomFilter(const unsigned int nElements, const double nFPRate, const unsigned int nTweak);
@@ -67,7 +68,7 @@ public:
      * It should generally always be a random value (and is largely only exposed for unit testing)
      * nFlags should be one of the BLOOM_UPDATE_* enums (not _MASK)
      */
-    CBloomFilter(const unsigned int nElements, const double nFPRate, const unsigned int nTweak, unsigned char nFlagsIn);
+    CBloomFilter(const unsigned int nElements, const double nFPRate, const unsigned int nTweak, uint8_t nFlagsIn);
     CBloomFilter() : isFull(true), isEmpty(false), nHashFuncs(0), nTweak(0), nFlags(0) {}
 
     ADD_SERIALIZE_METHODS;
@@ -80,11 +81,11 @@ public:
         READWRITE(nFlags);
     }
 
-    void insert(const std::vector<unsigned char>& vKey);
+    void insert(const std::vector<uint8_t>& vKey);
     void insert(const COutPoint& outpoint);
     void insert(const uint256& hash);
 
-    bool contains(const std::vector<unsigned char>& vKey) const;
+    bool contains(const std::vector<uint8_t>& vKey) const;
     bool contains(const COutPoint& outpoint) const;
     bool contains(const uint256& hash) const;
 
@@ -124,9 +125,9 @@ public:
     // constructed before the randomizer is properly initialized.
     CRollingBloomFilter(const unsigned int nElements, const double nFPRate);
 
-    void insert(const std::vector<unsigned char>& vKey);
+    void insert(const std::vector<uint8_t>& vKey);
     void insert(const uint256& hash);
-    bool contains(const std::vector<unsigned char>& vKey) const;
+    bool contains(const std::vector<uint8_t>& vKey) const;
     bool contains(const uint256& hash) const;
 
     void reset();
