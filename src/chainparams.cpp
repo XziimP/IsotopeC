@@ -1,6 +1,6 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
-// Copyright (c) 2019 IsotopeC Development Labs
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -24,7 +24,7 @@ static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesi
     txNew.nVersion = 1;
     txNew.vin.resize(1);
     txNew.vout.resize(1);
-    txNew.vin[0].scriptSig = CScript() << 486604799 << CScriptNum(4) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+    txNew.vin[0].scriptSig = CScript() << 486604799 << CScriptNum(4) << std::vector<uint8_t>((const uint8_t *)pszTimestamp, (const uint8_t *)pszTimestamp + strlen(pszTimestamp));
     txNew.vout[0].nValue = genesisReward;
     txNew.vout[0].scriptPubKey = genesisOutputScript;
 
@@ -134,13 +134,13 @@ public:
 
         genesis = CreateGenesisBlock(1572248631, 305493, 0x1e0ffff0, 1, 32*COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        
+
         assert (consensus.hashGenesisBlock == uint256S("0x0000094f032c3b1ca5e500df384141b75e6081c832f408f67ed517e9762546b3"));
         assert (genesis.hashMerkleRoot == uint256S("0x1d4f749ae57afd16b96d9c8543dec6e04a45e7d0480ef4cfcfff1aaa0695f826"));
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,102);
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,88);
-        base58Prefixes[SECRET_KEY]     = std::vector<unsigned char>(1,128);
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<uint8_t>(1,102);
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<uint8_t>(1,88);
+        base58Prefixes[SECRET_KEY]     = std::vector<uint8_t>(1,128);
         base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x88, 0xB2, 0x1E};
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x88, 0xAD, 0xE4};
 
@@ -232,9 +232,9 @@ public:
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_test, pnSeed6_test + ARRAYLEN(pnSeed6_test));
         vSeeds.emplace_back("testnet.isotopec.org", false); // IsotopeC Development Labs
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,43);
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,45);
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,199);
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<uint8_t>(1,43);
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<uint8_t>(1,45);
+        base58Prefixes[SECRET_KEY] =     std::vector<uint8_t>(1,199);
         base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x35, 0x87, 0xCF};
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94};
 
@@ -325,9 +325,9 @@ public:
             0
         };
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,43);
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,45);
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,199);
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<uint8_t>(1,43);
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<uint8_t>(1,45);
+        base58Prefixes[SECRET_KEY] =     std::vector<uint8_t>(1,199);
         base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x35, 0x87, 0xCF};
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94};
     }
