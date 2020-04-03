@@ -4,7 +4,7 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: @PACKAGE_NAME@ consensus library
-Description: Library for the isotopec consensus protocol.
+Description: Library for the IsotopeC consensus protocol.
 Version: @PACKAGE_VERSION@
 Libs: -L${libdir} -lisotopecconsensus
 Cflags: -I${includedir}
