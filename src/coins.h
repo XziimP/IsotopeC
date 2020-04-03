@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -103,7 +104,7 @@ public:
 struct CCoinsCacheEntry
 {
     Coin coin; // The actual cached data.
-    unsigned char flags;
+    uint8_t flags;
 
     enum Flags {
         DIRTY = (1 << 0), // This cache entry is potentially different from the version in the parent view.
