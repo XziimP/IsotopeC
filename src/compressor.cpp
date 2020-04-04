@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -45,7 +46,7 @@ bool CScriptCompressor::IsToPubKey(CPubKey &pubkey) const
     return false;
 }
 
-bool CScriptCompressor::Compress(std::vector<unsigned char> &out) const
+bool CScriptCompressor::Compress(std::vector<uint8_t> &out) const
 {
     CKeyID keyID;
     if (IsToKeyID(keyID)) {
@@ -85,7 +86,7 @@ unsigned int CScriptCompressor::GetSpecialSize(unsigned int nSize) const
     return 0;
 }
 
-bool CScriptCompressor::Decompress(unsigned int nSize, const std::vector<unsigned char> &in)
+bool CScriptCompressor::Decompress(unsigned int nSize, const std::vector<uint8_t> &in)
 {
     switch(nSize) {
     case 0x00:
@@ -114,7 +115,7 @@ bool CScriptCompressor::Decompress(unsigned int nSize, const std::vector<unsigne
         return true;
     case 0x04:
     case 0x05:
-        unsigned char vch[33] = {};
+        uint8_t vch[33] = {};
         vch[0] = nSize - 2;
         memcpy(&vch[1], in.data(), 32);
         CPubKey pubkey(&vch[0], &vch[33]);
