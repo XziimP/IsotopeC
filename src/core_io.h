@@ -1,4 +1,5 @@
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -24,7 +25,7 @@ bool DecodeHexTx(CMutableTransaction& tx, const std::string& strHexTx, bool fTry
 bool DecodeHexBlk(CBlock&, const std::string& strHexBlk);
 uint256 ParseHashUV(const UniValue& v, const std::string& strName);
 uint256 ParseHashStr(const std::string&, const std::string& strName);
-std::vector<unsigned char> ParseHexUV(const UniValue& v, const std::string& strName);
+std::vector<uint8_t> ParseHexUV(const UniValue& v, const std::string& strName);
 
 // core_write.cpp
 UniValue ValueFromAmount(const CAmount& amount);
