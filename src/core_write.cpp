@@ -1,4 +1,5 @@
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -33,7 +34,7 @@ std::string FormatScript(const CScript& script)
     opcodetype op;
     while (it != script.end()) {
         CScript::const_iterator it2 = it;
-        std::vector<unsigned char> vch;
+        std::vector<uint8_t> vch;
         if (script.GetOp2(it, op, &vch)) {
             if (op == OP_0) {
                 ret += "0 ";
@@ -61,13 +62,13 @@ std::string FormatScript(const CScript& script)
     return ret.substr(0, ret.size() - 1);
 }
 
-const std::map<unsigned char, std::string> mapSigHashTypes = {
-    {static_cast<unsigned char>(SIGHASH_ALL), std::string("ALL")},
-    {static_cast<unsigned char>(SIGHASH_ALL|SIGHASH_ANYONECANPAY), std::string("ALL|ANYONECANPAY")},
-    {static_cast<unsigned char>(SIGHASH_NONE), std::string("NONE")},
-    {static_cast<unsigned char>(SIGHASH_NONE|SIGHASH_ANYONECANPAY), std::string("NONE|ANYONECANPAY")},
-    {static_cast<unsigned char>(SIGHASH_SINGLE), std::string("SINGLE")},
-    {static_cast<unsigned char>(SIGHASH_SINGLE|SIGHASH_ANYONECANPAY), std::string("SINGLE|ANYONECANPAY")},
+const std::map<uint8_t, std::string> mapSigHashTypes = {
+    {static_cast<uint8_t>(SIGHASH_ALL), std::string("ALL")},
+    {static_cast<uint8_t>(SIGHASH_ALL|SIGHASH_ANYONECANPAY), std::string("ALL|ANYONECANPAY")},
+    {static_cast<uint8_t>(SIGHASH_NONE), std::string("NONE")},
+    {static_cast<uint8_t>(SIGHASH_NONE|SIGHASH_ANYONECANPAY), std::string("NONE|ANYONECANPAY")},
+    {static_cast<uint8_t>(SIGHASH_SINGLE), std::string("SINGLE")},
+    {static_cast<uint8_t>(SIGHASH_SINGLE|SIGHASH_ANYONECANPAY), std::string("SINGLE|ANYONECANPAY")},
 };
 
 /**
@@ -81,7 +82,7 @@ std::string ScriptToAsmStr(const CScript& script, const bool fAttemptSighashDeco
 {
     std::string str;
     opcodetype opcode;
-    std::vector<unsigned char> vch;
+    std::vector<uint8_t> vch;
     CScript::const_iterator pc = script.begin();
     while (pc < script.end()) {
         if (!str.empty()) {
@@ -92,7 +93,7 @@ std::string ScriptToAsmStr(const CScript& script, const bool fAttemptSighashDeco
             return str;
         }
         if (0 <= opcode && opcode <= OP_PUSHDATA4) {
-            if (vch.size() <= static_cast<std::vector<unsigned char>::size_type>(4)) {
+            if (vch.size() <= static_cast<std::vector<uint8_t>::size_type>(4)) {
                 str += strprintf("%d", CScriptNum(vch, false).getint());
             } else {
                 // the IsUnspendable check makes sure not to try to decode OP_RETURN data that may match the format of a signature
@@ -103,7 +104,7 @@ std::string ScriptToAsmStr(const CScript& script, const bool fAttemptSighashDeco
                     // the restrictions on the pubkey formats (see IsCompressedOrUncompressedPubKey) being incongruous with the
                     // checks in CheckSignatureEncoding.
                     if (CheckSignatureEncoding(vch, SCRIPT_VERIFY_STRICTENC, nullptr)) {
-                        const unsigned char chSigHashType = vch.back();
+                        const uint8_t chSigHashType = vch.back();
                         if (mapSigHashTypes.count(chSigHashType)) {
                             strSigHashDecode = "[" + mapSigHashTypes.find(chSigHashType)->second + "]";
                             vch.pop_back(); // remove the sighash type byte. it will be replaced by the decode.
