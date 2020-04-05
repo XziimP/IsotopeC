@@ -1,3 +1,5 @@
+// Copyright (c) 2019-2020 IsotopeC Development Labs
+
 #include "fs.h"
 
 namespace fsbridge {
