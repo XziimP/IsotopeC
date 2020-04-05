@@ -1,4 +1,5 @@
 // Copyright (c) 2013-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -13,7 +14,7 @@ inline uint32_t ROTL32(uint32_t x, int8_t r)
     return (x << r) | (x >> (32 - r));
 }
 
-unsigned int MurmurHash3(unsigned int nHashSeed, const std::vector<unsigned char>& vDataToHash)
+unsigned int MurmurHash3(unsigned int nHashSeed, const std::vector<uint8_t>& vDataToHash)
 {
     // The following is MurmurHash3 (x86_32), see http://code.google.com/p/smhasher/source/browse/trunk/MurmurHash3.cpp
     uint32_t h1 = nHashSeed;
@@ -69,9 +70,9 @@ unsigned int MurmurHash3(unsigned int nHashSeed, const std::vector<unsigned char
     return h1;
 }
 
-void BIP32Hash(const ChainCode &chainCode, unsigned int nChild, unsigned char header, const unsigned char data[32], unsigned char output[64])
+void BIP32Hash(const ChainCode &chainCode, uint8_t nChild, uint8_t header, const uint8_t data[32], uint8_t output[64])
 {
-    unsigned char num[4];
+    uint8_t num[4];
     num[0] = (nChild >> 24) & 0xFF;
     num[1] = (nChild >> 16) & 0xFF;
     num[2] = (nChild >>  8) & 0xFF;
@@ -120,7 +121,7 @@ CSipHasher& CSipHasher::Write(uint64_t data)
     return *this;
 }
 
-CSipHasher& CSipHasher::Write(const unsigned char* data, size_t size)
+CSipHasher& CSipHasher::Write(const uint8_t * data, size_t size)
 {
     uint64_t v0 = v[0], v1 = v[1], v2 = v[2], v3 = v[3];
     uint64_t t = tmp;
