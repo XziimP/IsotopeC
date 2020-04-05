@@ -1,4 +1,5 @@
 // Copyright (c) 2012-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -39,7 +40,7 @@ void HandleError(const leveldb::Status& status);
  * Database obfuscation should be considered an implementation detail of the
  * specific database.
  */
-const std::vector<unsigned char>& GetObfuscateKey(const CDBWrapper &w);
+const std::vector<uint8_t>& GetObfuscateKey(const CDBWrapper &w);
 
 };
 
@@ -175,7 +176,7 @@ public:
 
 class CDBWrapper
 {
-    friend const std::vector<unsigned char>& dbwrapper_private::GetObfuscateKey(const CDBWrapper &w);
+    friend const std::vector<uint8_t>& dbwrapper_private::GetObfuscateKey(const CDBWrapper &w);
 private:
     //! custom environment this database is using (may be nullptr in case of default environment)
     leveldb::Env* penv;
@@ -199,7 +200,7 @@ private:
     leveldb::DB* pdb;
 
     //! a key used for optional XOR-obfuscation of the database
-    std::vector<unsigned char> obfuscate_key;
+    std::vector<uint8_t> obfuscate_key;
 
     //! the key under which the obfuscation key is stored
     static const std::string OBFUSCATE_KEY_KEY;
@@ -207,7 +208,7 @@ private:
     //! the length of the obfuscate key in number of bytes
     static const unsigned int OBFUSCATE_KEY_NUM_BYTES;
 
-    std::vector<unsigned char> CreateObfuscateKey() const;
+    std::vector<uint8_t> CreateObfuscateKey() const;
 
 public:
     /**
