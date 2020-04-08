@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -69,7 +70,7 @@ static bool ExtractPubKey(const CScript &dest, CPubKey& pubKeyOut)
     //TODO: Use Solver to extract this?
     CScript::const_iterator pc = dest.begin();
     opcodetype opcode;
-    std::vector<unsigned char> vch;
+    std::vector<uint8_t> vch;
     if (!dest.GetOp(pc, opcode, vch) || vch.size() < 33 || vch.size() > 65)
         return false;
     pubKeyOut = CPubKey(vch);
