@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2015 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -107,7 +108,7 @@ public:
     virtual bool HaveWatchOnly() const override;
 };
 
-typedef std::vector<unsigned char, secure_allocator<unsigned char> > CKeyingMaterial;
-typedef std::map<CKeyID, std::pair<CPubKey, std::vector<unsigned char> > > CryptedKeyMap;
+typedef std::vector<uint8_t, secure_allocator<uint8_t> > CKeyingMaterial;
+typedef std::map<CKeyID, std::pair<CPubKey, std::vector<uint8_t> > > CryptedKeyMap;
 
 #endif // BITCOIN_KEYSTORE_H
