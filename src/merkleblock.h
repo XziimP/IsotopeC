@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -88,7 +89,7 @@ public:
     inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(nTransactions);
         READWRITE(vHash);
-        std::vector<unsigned char> vBytes;
+        std::vector<uint8_t> vBytes;
         if (ser_action.ForRead()) {
             READWRITE(vBytes);
             CPartialMerkleTree &us = *(const_cast<CPartialMerkleTree*>(this));
