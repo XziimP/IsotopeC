@@ -1,4 +1,5 @@
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -31,7 +32,7 @@ enum Network
 class CNetAddr
 {
     protected:
-        unsigned char ip[16]; // in network byte order
+        uint8_t ip[16]; // in network byte order
         uint32_t scopeId; // for scoped/link-local ipv6 addresses
 
     public:
@@ -79,7 +80,7 @@ class CNetAddr
         unsigned int GetByte(int n) const;
         uint64_t GetHash() const;
         bool GetInAddr(struct in_addr* pipv4Addr) const;
-        std::vector<unsigned char> GetGroup() const;
+        std::vector<uint8_t> GetGroup() const;
         int GetReachabilityFrom(const CNetAddr *paddrPartner = nullptr) const;
 
         CNetAddr(const struct in6_addr& pipv6Addr, const uint32_t scope = 0);
