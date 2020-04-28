@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -111,7 +112,7 @@ struct CSerializedNetMsg
     CSerializedNetMsg(const CSerializedNetMsg& msg) = delete;
     CSerializedNetMsg& operator=(const CSerializedNetMsg&) = delete;
 
-    std::vector<unsigned char> data;
+    std::vector<uint8_t> data;
     std::string command;
 };
 
@@ -606,7 +607,7 @@ public:
     size_t nSendSize; // total size of all vSendMsg entries
     size_t nSendOffset; // offset inside the first vSendMsg already sent
     uint64_t nSendBytes;
-    std::deque<std::vector<unsigned char>> vSendMsg;
+    std::deque<std::vector<uint8_t>> vSendMsg;
     CCriticalSection cs_vSend;
     CCriticalSection cs_hSocket;
     CCriticalSection cs_vRecv;
