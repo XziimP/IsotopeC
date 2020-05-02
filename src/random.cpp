@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -90,7 +91,7 @@ static void RDRandInit()
 static void RDRandInit() {}
 #endif
 
-static bool GetHWRand(unsigned char* ent32) {
+static bool GetHWRand(uint8_t *ent32) {
 #if defined(__x86_64__) || defined(__amd64__) || defined(__i386__)
     assert(hwrand_initialized.load(std::memory_order_relaxed));
     if (rdrand_supported) {
@@ -149,7 +150,7 @@ static void RandAddSeedPerfmon()
         return;
     nLastPerfmon = GetTime();
 
-    std::vector<unsigned char> vData(250000, 0);
+    std::vector<uint8_t> vData(250000, 0);
     long ret = 0;
     unsigned long nSize = 0;
     const size_t nMaxSize = 10000000; // Bail out at more than 10MB of performance data
@@ -179,7 +180,7 @@ static void RandAddSeedPerfmon()
 /** Fallback: get 32 bytes of system entropy from /dev/urandom. The most
  * compatible way to get cryptographic randomness on UNIX-ish platforms.
  */
-void GetDevURandom(unsigned char *ent32)
+void GetDevURandom(uint8_t *ent32)
 {
     int f = open("/dev/urandom", O_RDONLY);
     if (f == -1) {
@@ -199,7 +200,7 @@ void GetDevURandom(unsigned char *ent32)
 #endif
 
 /** Get 32 bytes of system entropy. */
-void GetOSRand(unsigned char *ent32)
+void GetOSRand(uint8_t *ent32)
 {
 #if defined(WIN32)
     HCRYPTPROV hProvider;
@@ -270,7 +271,7 @@ void GetOSRand(unsigned char *ent32)
 #endif
 }
 
-void GetRandBytes(unsigned char* buf, int num)
+void GetRandBytes(uint8_t *buf, int num)
 {
     if (RAND_bytes(buf, num) != 1) {
         RandFailure();
@@ -295,18 +296,18 @@ void RandAddSeedSleep()
 
 
 static std::mutex cs_rng_state;
-static unsigned char rng_state[32] = {0};
+static uint8_t rng_state[32] = {0};
 static uint64_t rng_counter = 0;
 
 static void AddDataToRng(void* data, size_t len) {
     CSHA512 hasher;
-    hasher.Write((const unsigned char*)&len, sizeof(len));
-    hasher.Write((const unsigned char*)data, len);
-    unsigned char buf[64];
+    hasher.Write((const uint8_t *)&len, sizeof(len));
+    hasher.Write((const uint8_t *)data, len);
+    uint8_t buf[64];
     {
         std::unique_lock<std::mutex> lock(cs_rng_state);
         hasher.Write(rng_state, sizeof(rng_state));
-        hasher.Write((const unsigned char*)&rng_counter, sizeof(rng_counter));
+        hasher.Write((const uint8_t *)&rng_counter, sizeof(rng_counter));
         ++rng_counter;
         hasher.Finalize(buf);
         memcpy(rng_state, buf + 32, 32);
@@ -314,11 +315,11 @@ static void AddDataToRng(void* data, size_t len) {
     memory_cleanse(buf, 64);
 }
 
-void GetStrongRandBytes(unsigned char* out, int num)
+void GetStrongRandBytes(uint8_t *out, int num)
 {
     assert(num <= 32);
     CSHA512 hasher;
-    unsigned char buf[64];
+    uint8_t buf[64];
 
     // First source: OpenSSL's RNG
     RandAddSeedPerfmon();
@@ -338,7 +339,7 @@ void GetStrongRandBytes(unsigned char* out, int num)
     {
         std::unique_lock<std::mutex> lock(cs_rng_state);
         hasher.Write(rng_state, sizeof(rng_state));
-        hasher.Write((const unsigned char*)&rng_counter, sizeof(rng_counter));
+        hasher.Write((const uint8_t *)&rng_counter, sizeof(rng_counter));
         ++rng_counter;
         hasher.Finalize(buf);
         memcpy(rng_state, buf + 32, 32);
@@ -359,7 +360,7 @@ uint64_t GetRand(uint64_t nMax)
     uint64_t nRange = (std::numeric_limits<uint64_t>::max() / nMax) * nMax;
     uint64_t nRand = 0;
     do {
-        GetRandBytes((unsigned char*)&nRand, sizeof(nRand));
+        GetRandBytes((uint8_t *)&nRand, sizeof(nRand));
     } while (nRand >= nRange);
     return (nRand % nMax);
 }
@@ -372,7 +373,7 @@ int GetRandInt(int nMax)
 uint256 GetRandHash()
 {
     uint256 hash;
-    GetRandBytes((unsigned char*)&hash, sizeof(hash));
+    GetRandBytes((uint8_t *)&hash, sizeof(hash));
     return hash;
 }
 
@@ -394,9 +395,9 @@ uint256 FastRandomContext::rand256()
     return ret;
 }
 
-std::vector<unsigned char> FastRandomContext::randbytes(size_t len)
+std::vector<uint8_t> FastRandomContext::randbytes(size_t len)
 {
-    std::vector<unsigned char> ret(len);
+    std::vector<uint8_t> ret(len);
     if (len > 0) {
         rng.Output(&ret[0], len);
     }
@@ -446,8 +447,8 @@ bool Random_SanityCheck()
     if (stop == start) return false;
 
     // We called GetPerformanceCounter. Use it as entropy.
-    RAND_add((const unsigned char*)&start, sizeof(start), 1);
-    RAND_add((const unsigned char*)&stop, sizeof(stop), 1);
+    RAND_add((const uint8_t *)&start, sizeof(start), 1);
+    RAND_add((const uint8_t *)&stop, sizeof(stop), 1);
 
     return true;
 }
