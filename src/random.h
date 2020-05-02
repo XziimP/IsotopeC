@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -18,7 +19,7 @@ void RandAddSeed();
 /**
  * Functions to gather random data via the OpenSSL PRNG
  */
-void GetRandBytes(unsigned char* buf, int num);
+void GetRandBytes(uint8_t *buf, int num);
 uint64_t GetRand(uint64_t nMax);
 int GetRandInt(int nMax);
 uint256 GetRandHash();
@@ -34,7 +35,7 @@ void RandAddSeedSleep();
  * Function to gather random data from multiple sources, failing whenever any
  * of those source fail to provide a result.
  */
-void GetStrongRandBytes(unsigned char* buf, int num);
+void GetStrongRandBytes(uint8_t *buf, int num);
 
 /**
  * Fast randomness source. This is seeded once with secure random data, but
@@ -46,7 +47,7 @@ private:
     bool requires_seed;
     ChaCha20 rng;
 
-    unsigned char bytebuf[64];
+    uint8_t bytebuf[64];
     int bytebuf_size;
 
     uint64_t bitbuf;
@@ -111,7 +112,7 @@ public:
     }
 
     /** Generate random bytes. */
-    std::vector<unsigned char> randbytes(size_t len);
+    std::vector<uint8_t> randbytes(size_t len);
 
     /** Generate a random 32-bit integer. */
     uint32_t rand32() { return randbits(32); }
@@ -133,7 +134,7 @@ static const ssize_t NUM_OS_RANDOM_BYTES = 32;
 /** Get 32 bytes of system entropy. Do not use this in application code: use
  * GetStrongRandBytes instead.
  */
-void GetOSRand(unsigned char *ent32);
+void GetOSRand(uint8_t *ent32);
 
 /** Check that OS randomness is available and returning the requested number
  * of bytes.
