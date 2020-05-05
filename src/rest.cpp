@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -79,7 +80,7 @@ static enum RetFormat ParseDataFormat(std::string& param, const std::string& str
     param = strReq.substr(0, pos);
     const std::string suff(strReq, pos + 1);
 
-    for (unsigned int i = 0; i < ARRAYLEN(rf_names); i++)
+    for (size_t i = 0; i < ARRAYLEN(rf_names); i++)
         if (suff == rf_names[i].name)
             return rf_names[i].rf;
 
@@ -91,7 +92,7 @@ static enum RetFormat ParseDataFormat(std::string& param, const std::string& str
 static std::string AvailableDataFormatsString()
 {
     std::string formats = "";
-    for (unsigned int i = 0; i < ARRAYLEN(rf_names); i++)
+    for (size_t i = 0; i < ARRAYLEN(rf_names); i++)
         if (strlen(rf_names[i].name) > 0) {
             formats.append(".");
             formats.append(rf_names[i].name);
@@ -151,7 +152,7 @@ static bool rest_headers(HTTPRequest* req,
         const CBlockIndex *pindex = (it != mapBlockIndex.end()) ? it->second : nullptr;
         while (pindex != nullptr && chainActive.Contains(pindex)) {
             headers.push_back(pindex);
-            if (headers.size() == (unsigned long)count)
+            if (headers.size() == size_t(count))
                 break;
             pindex = chainActive.Next(pindex);
         }
@@ -455,7 +456,7 @@ static bool rest_getutxos(HTTPRequest* req, const std::string& strURIPart)
     switch (rf) {
     case RF_HEX: {
         // convert hex to bin, continue then with bin part
-        std::vector<unsigned char> strRequestV = ParseHex(strRequestMutable);
+        std::vector<uint8_t> strRequestV = ParseHex(strRequestMutable);
         strRequestMutable.assign(strRequestV.begin(), strRequestV.end());
     }
 
@@ -494,7 +495,7 @@ static bool rest_getutxos(HTTPRequest* req, const std::string& strURIPart)
         return RESTERR(req, HTTP_BAD_REQUEST, strprintf("Error: max outpoints exceeded (max: %d, tried: %d)", MAX_GETUTXOS_OUTPOINTS, vOutPoints.size()));
 
     // check spentness and form a bitmap (as well as a JSON capable human-readable string representation)
-    std::vector<unsigned char> bitmap;
+    std::vector<uint8_t> bitmap;
     std::vector<CCoin> outs;
     std::string bitmapStringRepresentation;
     std::vector<bool> hits;
@@ -602,7 +603,7 @@ static const struct {
 
 bool StartREST()
 {
-    for (unsigned int i = 0; i < ARRAYLEN(uri_prefixes); i++)
+    for (size_t i = 0; i < ARRAYLEN(uri_prefixes); i++)
         RegisterHTTPHandler(uri_prefixes[i].prefix, false, uri_prefixes[i].handler);
     return true;
 }
@@ -613,6 +614,6 @@ void InterruptREST()
 
 void StopREST()
 {
-    for (unsigned int i = 0; i < ARRAYLEN(uri_prefixes); i++)
+    for (size_t i = 0; i < ARRAYLEN(uri_prefixes); i++)
         UnregisterHTTPHandler(uri_prefixes[i].prefix, false);
 }
