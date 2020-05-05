@@ -1,4 +1,5 @@
 // Taken from https://gist.github.com/arvidsson/7231973
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 
 #ifndef BITCOIN_REVERSE_ITERATOR_H
 #define BITCOIN_REVERSE_ITERATOR_H
