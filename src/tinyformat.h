@@ -1,3 +1,5 @@
+// Copyright (c) 2019-2020 IsotopeC Development Labs
+//
 // tinyformat.h
 // Copyright (C) 2011, Chris Foster [chris42f (at) gmail (d0t) com]
 //
@@ -139,7 +141,7 @@ namespace tfm = tinyformat;
 #include <stdexcept>
 
 #ifndef TINYFORMAT_ERROR
-#   define TINYFORMAT_ERROR(reason) assert(0 && reason)
+#define TINYFORMAT_ERROR(reason) assert(0 && reason)
 #endif
 
 #if !defined(TINYFORMAT_USE_VARIADIC_TEMPLATES) && !defined(TINYFORMAT_NO_VARIADIC_TEMPLATES)
@@ -151,15 +153,15 @@ namespace tfm = tinyformat;
 #if defined(__GLIBCXX__) && __GLIBCXX__ < 20080201
 //  std::showpos is broken on old libstdc++ as provided with OSX.  See
 //  http://gcc.gnu.org/ml/libstdc++/2007-11/msg00075.html
-#   define TINYFORMAT_OLD_LIBSTDCPLUSPLUS_WORKAROUND
+#define TINYFORMAT_OLD_LIBSTDCPLUSPLUS_WORKAROUND
 #endif
 
 #ifdef __APPLE__
 // Workaround OSX linker warning: xcode uses different default symbol
 // visibilities for static libs vs executables (see issue #25)
-#   define TINYFORMAT_HIDDEN __attribute__((visibility("hidden")))
+#define TINYFORMAT_HIDDEN __attribute__((visibility("hidden")))
 #else
-#   define TINYFORMAT_HIDDEN
+#define TINYFORMAT_HIDDEN
 #endif
 
 namespace tinyformat {
@@ -362,7 +364,7 @@ inline void formatValue(std::ostream& out, const char* /*fmtBegin*/,  \
 // per 3.9.1: char, signed char and unsigned char are all distinct types
 TINYFORMAT_DEFINE_FORMATVALUE_CHAR(char)
 TINYFORMAT_DEFINE_FORMATVALUE_CHAR(signed char)
-TINYFORMAT_DEFINE_FORMATVALUE_CHAR(unsigned char)
+TINYFORMAT_DEFINE_FORMATVALUE_CHAR(uint8_t)
 #undef TINYFORMAT_DEFINE_FORMATVALUE_CHAR
 
 
