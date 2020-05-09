@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -84,7 +85,7 @@ class CVectorWriter
  * @param[in]  nPosIn Starting position. Vector index where writes should start. The vector will initially
  *                    grow as necessary to  max(index, vec.size()). So to append, use vec.size().
 */
-    CVectorWriter(int nTypeIn, int nVersionIn, std::vector<unsigned char>& vchDataIn, size_t nPosIn) : nType(nTypeIn), nVersion(nVersionIn), vchData(vchDataIn), nPos(nPosIn)
+    CVectorWriter(int nTypeIn, int nVersionIn, std::vector<uint8_t>& vchDataIn, size_t nPosIn) : nType(nTypeIn), nVersion(nVersionIn), vchData(vchDataIn), nPos(nPosIn)
     {
         if(nPos > vchData.size())
             vchData.resize(nPos);
@@ -94,7 +95,7 @@ class CVectorWriter
  * @param[in]  args  A list of items to serialize starting at nPos.
 */
     template <typename... Args>
-    CVectorWriter(int nTypeIn, int nVersionIn, std::vector<unsigned char>& vchDataIn, size_t nPosIn, Args&&... args) : CVectorWriter(nTypeIn, nVersionIn, vchDataIn, nPosIn)
+    CVectorWriter(int nTypeIn, int nVersionIn, std::vector<uint8_t>& vchDataIn, size_t nPosIn, Args&&... args) : CVectorWriter(nTypeIn, nVersionIn, vchDataIn, nPosIn)
     {
         ::SerializeMany(*this, std::forward<Args>(args)...);
     }
@@ -103,10 +104,10 @@ class CVectorWriter
         assert(nPos <= vchData.size());
         size_t nOverwrite = std::min(nSize, vchData.size() - nPos);
         if (nOverwrite) {
-            memcpy(vchData.data() + nPos, reinterpret_cast<const unsigned char*>(pch), nOverwrite);
+            memcpy(vchData.data() + nPos, reinterpret_cast<const uint8_t *>(pch), nOverwrite);
         }
         if (nOverwrite < nSize) {
-            vchData.insert(vchData.end(), reinterpret_cast<const unsigned char*>(pch) + nOverwrite, reinterpret_cast<const unsigned char*>(pch) + nSize);
+            vchData.insert(vchData.end(), reinterpret_cast<const uint8_t *>(pch) + nOverwrite, reinterpret_cast<const uint8_t *>(pch) + nSize);
         }
         nPos += nSize;
     }
@@ -134,7 +135,7 @@ class CVectorWriter
 private:
     const int nType;
     const int nVersion;
-    std::vector<unsigned char>& vchData;
+    std::vector<uint8_t>& vchData;
     size_t nPos;
 };
 
@@ -189,7 +190,7 @@ public:
         Init(nTypeIn, nVersionIn);
     }
 
-    CDataStream(const std::vector<unsigned char>& vchIn, int nTypeIn, int nVersionIn) : vch(vchIn.begin(), vchIn.end())
+    CDataStream(const std::vector<uint8_t>& vchIn, int nTypeIn, int nVersionIn) : vch(vchIn.begin(), vchIn.end())
     {
         Init(nTypeIn, nVersionIn);
     }
@@ -418,7 +419,7 @@ public:
      *
      * @param[in] key    The key used to XOR the data in this stream.
      */
-    void Xor(const std::vector<unsigned char>& key)
+    void Xor(const std::vector<uint8_t>& key)
     {
         if (key.size() == 0) {
             return;
@@ -517,7 +518,7 @@ public:
     {
         if (!file)
             throw std::ios_base::failure("CAutoFile::ignore: file handle is nullptr");
-        unsigned char data[4096];
+        uint8_t data[4096];
         while (nSize > 0) {
             size_t nNow = std::min<size_t>(nSize, sizeof(data));
             if (fread(data, 1, nNow, file) != nNow)
