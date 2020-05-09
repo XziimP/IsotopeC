@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -23,7 +24,7 @@
 
 #include "prevector.h"
 
-static const unsigned int MAX_SIZE = 0x02000000;
+static const uint64_t MAX_SIZE = 0x02000000;
 
 /**
  * Dummy data type to identify deserializing constructors.
@@ -206,12 +207,12 @@ template<typename Stream> inline void Unserialize(Stream& s, bool& a) { char f=s
  * size <= UINT_MAX   -- 5 bytes  (254 + 4 bytes)
  * size >  UINT_MAX   -- 9 bytes  (255 + 8 bytes)
  */
-inline unsigned int GetSizeOfCompactSize(uint64_t nSize)
+inline uint32_t GetSizeOfCompactSize(uint64_t nSize)
 {
-    if (nSize < 253)             return sizeof(unsigned char);
-    else if (nSize <= std::numeric_limits<unsigned short>::max()) return sizeof(unsigned char) + sizeof(unsigned short);
-    else if (nSize <= std::numeric_limits<unsigned int>::max())  return sizeof(unsigned char) + sizeof(unsigned int);
-    else                         return sizeof(unsigned char) + sizeof(uint64_t);
+    if (nSize < 253)             return sizeof(uint8_t);
+    else if (nSize <= std::numeric_limits<uint16_t>::max()) return sizeof(uint8_t) + sizeof(uint16_t);
+    else if (nSize <= std::numeric_limits<uint32_t>::max())  return sizeof(uint8_t) + sizeof(uint32_t);
+    else                         return sizeof(uint8_t) + sizeof(uint64_t);
 }
 
 inline void WriteCompactSize(CSizeComputer& os, uint64_t nSize);
@@ -223,12 +224,12 @@ void WriteCompactSize(Stream& os, uint64_t nSize)
     {
         ser_writedata8(os, nSize);
     }
-    else if (nSize <= std::numeric_limits<unsigned short>::max())
+    else if (nSize <= std::numeric_limits<uint16_t>::max())
     {
         ser_writedata8(os, 253);
         ser_writedata16(os, nSize);
     }
-    else if (nSize <= std::numeric_limits<unsigned int>::max())
+    else if (nSize <= std::numeric_limits<uint32_t>::max())
     {
         ser_writedata8(os, 254);
         ser_writedata32(os, nSize);
@@ -316,7 +317,7 @@ inline void WriteVarInt(CSizeComputer& os, I n);
 template<typename Stream, typename I>
 void WriteVarInt(Stream& os, I n)
 {
-    unsigned char tmp[(sizeof(n)*8+6)/7];
+    uint8_t tmp[(sizeof(n)*8+6)/7];
     int len=0;
     while(true) {
         tmp[len] = (n & 0x7F) | (len ? 0x80 : 0x00);
@@ -335,7 +336,7 @@ I ReadVarInt(Stream& is)
 {
     I n = 0;
     while(true) {
-        unsigned char chData = ser_readdata8(is);
+        uint8_t chData = ser_readdata8(is);
         if (n > (std::numeric_limits<I>::max() >> 7)) {
            throw std::ios_base::failure("ReadVarInt(): size too large");
         }
@@ -477,23 +478,23 @@ template<typename Stream, typename C> void Unserialize(Stream& is, std::basic_st
 
 /**
  * prevector
- * prevectors of unsigned char are a special case and are intended to be serialized as a single opaque blob.
+ * prevectors of uint8_t are a special case and are intended to be serialized as a single opaque blob.
  */
-template<typename Stream, unsigned int N, typename T> void Serialize_impl(Stream& os, const prevector<N, T>& v, const unsigned char&);
+template<typename Stream, unsigned int N, typename T> void Serialize_impl(Stream& os, const prevector<N, T>& v, const uint8_t &);
 template<typename Stream, unsigned int N, typename T, typename V> void Serialize_impl(Stream& os, const prevector<N, T>& v, const V&);
 template<typename Stream, unsigned int N, typename T> inline void Serialize(Stream& os, const prevector<N, T>& v);
-template<typename Stream, unsigned int N, typename T> void Unserialize_impl(Stream& is, prevector<N, T>& v, const unsigned char&);
+template<typename Stream, unsigned int N, typename T> void Unserialize_impl(Stream& is, prevector<N, T>& v, const uint8_8 &);
 template<typename Stream, unsigned int N, typename T, typename V> void Unserialize_impl(Stream& is, prevector<N, T>& v, const V&);
 template<typename Stream, unsigned int N, typename T> inline void Unserialize(Stream& is, prevector<N, T>& v);
 
 /**
  * vector
- * vectors of unsigned char are a special case and are intended to be serialized as a single opaque blob.
+ * vectors of uint8_t are a special case and are intended to be serialized as a single opaque blob.
  */
-template<typename Stream, typename T, typename A> void Serialize_impl(Stream& os, const std::vector<T, A>& v, const unsigned char&);
+template<typename Stream, typename T, typename A> void Serialize_impl(Stream& os, const std::vector<T, A>& v, const uint8_t &);
 template<typename Stream, typename T, typename A, typename V> void Serialize_impl(Stream& os, const std::vector<T, A>& v, const V&);
 template<typename Stream, typename T, typename A> inline void Serialize(Stream& os, const std::vector<T, A>& v);
-template<typename Stream, typename T, typename A> void Unserialize_impl(Stream& is, std::vector<T, A>& v, const unsigned char&);
+template<typename Stream, typename T, typename A> void Unserialize_impl(Stream& is, std::vector<T, A>& v, const uint8_t &);
 template<typename Stream, typename T, typename A, typename V> void Unserialize_impl(Stream& is, std::vector<T, A>& v, const V&);
 template<typename Stream, typename T, typename A> inline void Unserialize(Stream& is, std::vector<T, A>& v);
 
@@ -562,7 +563,7 @@ void Serialize(Stream& os, const std::basic_string<C>& str)
 template<typename Stream, typename C>
 void Unserialize(Stream& is, std::basic_string<C>& str)
 {
-    unsigned int nSize = ReadCompactSize(is);
+    size_t nSize = ReadCompactSize(is);
     str.resize(nSize);
     if (nSize != 0)
         is.read((char*)str.data(), nSize * sizeof(C));
@@ -574,7 +575,7 @@ void Unserialize(Stream& is, std::basic_string<C>& str)
  * prevector
  */
 template<typename Stream, unsigned int N, typename T>
-void Serialize_impl(Stream& os, const prevector<N, T>& v, const unsigned char&)
+void Serialize_impl(Stream& os, const prevector<N, T>& v, const uint8_t &)
 {
     WriteCompactSize(os, v.size());
     if (!v.empty())
@@ -597,15 +598,15 @@ inline void Serialize(Stream& os, const prevector<N, T>& v)
 
 
 template<typename Stream, unsigned int N, typename T>
-void Unserialize_impl(Stream& is, prevector<N, T>& v, const unsigned char&)
+void Unserialize_impl(Stream& is, prevector<N, T>& v, const uint8_t &)
 {
     // Limit size per read so bogus size value won't cause out of memory
     v.clear();
-    unsigned int nSize = ReadCompactSize(is);
-    unsigned int i = 0;
+    size_t nSize = ReadCompactSize(is);
+    size_t i = 0;
     while (i < nSize)
     {
-        unsigned int blk = std::min(nSize - i, (unsigned int)(1 + 4999999 / sizeof(T)));
+        size_t blk = std::min(nSize - i, (unsigned int)(1 + 4999999 / sizeof(T)));
         v.resize(i + blk);
         is.read((char*)&v[i], blk * sizeof(T));
         i += blk;
@@ -616,9 +617,9 @@ template<typename Stream, unsigned int N, typename T, typename V>
 void Unserialize_impl(Stream& is, prevector<N, T>& v, const V&)
 {
     v.clear();
-    unsigned int nSize = ReadCompactSize(is);
-    unsigned int i = 0;
-    unsigned int nMid = 0;
+    size_t nSize = ReadCompactSize(is);
+    size_t i = 0;
+    size_t nMid = 0;
     while (nMid < nSize)
     {
         nMid += 5000000 / sizeof(T);
@@ -642,7 +643,7 @@ inline void Unserialize(Stream& is, prevector<N, T>& v)
  * vector
  */
 template<typename Stream, typename T, typename A>
-void Serialize_impl(Stream& os, const std::vector<T, A>& v, const unsigned char&)
+void Serialize_impl(Stream& os, const std::vector<T, A>& v, const uint8_t &)
 {
     WriteCompactSize(os, v.size());
     if (!v.empty())
@@ -665,15 +666,15 @@ inline void Serialize(Stream& os, const std::vector<T, A>& v)
 
 
 template<typename Stream, typename T, typename A>
-void Unserialize_impl(Stream& is, std::vector<T, A>& v, const unsigned char&)
+void Unserialize_impl(Stream& is, std::vector<T, A>& v, const uint8_t &)
 {
     // Limit size per read so bogus size value won't cause out of memory
     v.clear();
-    unsigned int nSize = ReadCompactSize(is);
-    unsigned int i = 0;
+    size_t nSize = ReadCompactSize(is);
+    size_t i = 0;
     while (i < nSize)
     {
-        unsigned int blk = std::min(nSize - i, (unsigned int)(1 + 4999999 / sizeof(T)));
+        size_t blk = std::min(nSize - i, (size_t)(1 + 4999999 / sizeof(T)));
         v.resize(i + blk);
         is.read((char*)&v[i], blk * sizeof(T));
         i += blk;
@@ -684,9 +685,9 @@ template<typename Stream, typename T, typename A, typename V>
 void Unserialize_impl(Stream& is, std::vector<T, A>& v, const V&)
 {
     v.clear();
-    unsigned int nSize = ReadCompactSize(is);
-    unsigned int i = 0;
-    unsigned int nMid = 0;
+    size_t nSize = ReadCompactSize(is);
+    size_t i = 0;
+    size_t nMid = 0;
     while (nMid < nSize)
     {
         nMid += 5000000 / sizeof(T);
@@ -740,9 +741,9 @@ template<typename Stream, typename K, typename T, typename Pred, typename A>
 void Unserialize(Stream& is, std::map<K, T, Pred, A>& m)
 {
     m.clear();
-    unsigned int nSize = ReadCompactSize(is);
+    size_t nSize = ReadCompactSize(is);
     typename std::map<K, T, Pred, A>::iterator mi = m.begin();
-    for (unsigned int i = 0; i < nSize; i++)
+    for (size_t i = 0; i < nSize; i++)
     {
         std::pair<K, T> item;
         Unserialize(is, item);
@@ -767,9 +768,9 @@ template<typename Stream, typename K, typename Pred, typename A>
 void Unserialize(Stream& is, std::set<K, Pred, A>& m)
 {
     m.clear();
-    unsigned int nSize = ReadCompactSize(is);
+    size_t nSize = ReadCompactSize(is);
     typename std::set<K, Pred, A>::iterator it = m.begin();
-    for (unsigned int i = 0; i < nSize; i++)
+    for (size_t i = 0; i < nSize; i++)
     {
         K key;
         Unserialize(is, key);
@@ -836,14 +837,6 @@ inline void SerReadWrite(Stream& s, T& obj, CSerActionUnserialize ser_action)
 {
     ::Unserialize(s, obj);
 }
-
-
-
-
-
-
-
-
 
 /* ::GetSerializeSize implementations
  *
