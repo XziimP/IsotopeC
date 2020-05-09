@@ -606,7 +606,7 @@ void Unserialize_impl(Stream& is, prevector<N, T>& v, const uint8_t &)
     size_t i = 0;
     while (i < nSize)
     {
-        size_t blk = std::min(nSize - i, (unsigned int)(1 + 4999999 / sizeof(T)));
+        size_t blk = std::min(nSize - i, (size_t)(1 + 4999999 / sizeof(T)));
         v.resize(i + blk);
         is.read((char*)&v[i], blk * sizeof(T));
         i += blk;
