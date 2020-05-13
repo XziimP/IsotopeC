@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -28,7 +29,7 @@ public:
         ::Serialize(s, VARINT(txout->nHeight * 2 + (txout->fCoinBase ? 1 : 0)));
         if (txout->nHeight > 0) {
             // Required to maintain compatibility with older undo format.
-            ::Serialize(s, (unsigned char)0);
+            ::Serialize(s, (uint8_t)0);
         }
         ::Serialize(s, CTxOutCompressor(REF(txout->out)));
     }
@@ -43,7 +44,7 @@ class TxInUndoDeserializer
 public:
     template<typename Stream>
     void Unserialize(Stream &s) {
-        unsigned int nCode = 0;
+        uint32_t nCode = 0;
         ::Unserialize(s, VARINT(nCode));
         txout->nHeight = nCode / 2;
         txout->fCoinBase = nCode & 1;
