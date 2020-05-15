@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -15,8 +16,8 @@
 
 #define BEGIN(a)            ((char*)&(a))
 #define END(a)              ((char*)&((&(a))[1]))
-#define UBEGIN(a)           ((unsigned char*)&(a))
-#define UEND(a)             ((unsigned char*)&((&(a))[1]))
+#define UBEGIN(a)           ((uint8_t *)&(a))
+#define UEND(a)             ((uint8_t *)&((&(a))[1]))
 #define ARRAYLEN(array)     (sizeof(array)/sizeof((array)[0]))
 
 /** Used by SanitizeString() */
@@ -35,8 +36,8 @@ enum SafeChars
 * @return           A new string without unsafe chars
 */
 std::string SanitizeString(const std::string& str, int rule = SAFE_CHARS_DEFAULT);
-std::vector<unsigned char> ParseHex(const char* psz);
-std::vector<unsigned char> ParseHex(const std::string& str);
+std::vector<uint8_t> ParseHex(const char* psz);
+std::vector<uint8_t> ParseHex(const std::string& str);
 signed char HexDigit(char c);
 /* Returns true if each character in str is a hex character, and has an even
  * number of hex digits.*/
@@ -45,13 +46,13 @@ bool IsHex(const std::string& str);
 * Return true if the string is a hex number, optionally prefixed with "0x"
 */
 bool IsHexNumber(const std::string& str);
-std::vector<unsigned char> DecodeBase64(const char* p, bool* pfInvalid = nullptr);
+std::vector<uint8_t> DecodeBase64(const char* p, bool* pfInvalid = nullptr);
 std::string DecodeBase64(const std::string& str);
-std::string EncodeBase64(const unsigned char* pch, size_t len);
+std::string EncodeBase64(const uint8_t *pch, size_t len);
 std::string EncodeBase64(const std::string& str);
-std::vector<unsigned char> DecodeBase32(const char* p, bool* pfInvalid = nullptr);
+std::vector<uint8_t> DecodeBase32(const char* p, bool* pfInvalid = nullptr);
 std::string DecodeBase32(const std::string& str);
-std::string EncodeBase32(const unsigned char* pch, size_t len);
+std::string EncodeBase32(const uint8_t *pch, size_t len);
 std::string EncodeBase32(const std::string& str);
 
 void SplitHostPort(std::string in, int &portOut, std::string &hostOut);
@@ -105,7 +106,7 @@ std::string HexStr(const T itbegin, const T itend, bool fSpaces=false)
     rv.reserve((itend-itbegin)*3);
     for(T it = itbegin; it < itend; ++it)
     {
-        unsigned char val = (unsigned char)(*it);
+        uint8_t val = (uint8_t)(*it);
         if(fSpaces && it != itbegin)
             rv.push_back(' ');
         rv.push_back(hexmap[val>>4]);
