@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2019-2020 IsotopeC Development Labs
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -44,10 +45,10 @@ private:
      * Just store the serialized data.
      * Its length can very cheaply be computed from the first byte.
      */
-    unsigned char vch[65];
+    uint8_t vch[65];
 
     //! Compute the length of a pubkey with a given first byte.
-    unsigned int static GetLen(unsigned char chHeader)
+    unsigned int static GetLen(uint8_t chHeader)
     {
         if (chHeader == 2 || chHeader == 3)
             return 33;
@@ -75,7 +76,7 @@ public:
     {
         int len = pend == pbegin ? 0 : GetLen(pbegin[0]);
         if (len && len == (pend - pbegin))
-            memcpy(vch, (unsigned char*)&pbegin[0], len);
+            memcpy(vch, (uint8_t *)&pbegin[0], len);
         else
             Invalidate();
     }
@@ -88,16 +89,16 @@ public:
     }
 
     //! Construct a public key from a byte vector.
-    CPubKey(const std::vector<unsigned char>& _vch)
+    CPubKey(const std::vector<uint8_t>& _vch)
     {
         Set(_vch.begin(), _vch.end());
     }
 
     //! Simple read-only vector-like interface to the pubkey data.
     unsigned int size() const { return GetLen(vch[0]); }
-    const unsigned char* begin() const { return vch; }
-    const unsigned char* end() const { return vch + size(); }
-    const unsigned char& operator[](unsigned int pos) const { return vch[pos]; }
+    const uint8_t *begin() const { return vch; }
+    const uint8_t *end() const { return vch + size(); }
+    const uint8_t &operator[](unsigned int pos) const { return vch[pos]; }
 
     //! Comparator implementation.
     friend bool operator==(const CPubKey& a, const CPubKey& b)
@@ -173,15 +174,21 @@ public:
      * Verify a DER signature (~72 bytes).
      * If this public key is not fully valid, the return value will be false.
      */
-    bool Verify(const uint256& hash, const std::vector<unsigned char>& vchSig) const;
+    bool Verify(const uint256& hash, const std::vector<uint8_t> &vchSig) const;
+
+    /**
+     * We'll make a bool to verify a Schnorr Signature is 64 bytes after new
+     * IsotopeC Address format is released.
+     * If not, the return value will be false.
+     */
 
     /**
      * Check whether a signature is normalized (lower-S).
      */
-    static bool CheckLowS(const std::vector<unsigned char>& vchSig);
+    static bool CheckLowS(const std::vector<uint8_t> &vchSig);
 
     //! Recover a public key from a compact signature.
-    bool RecoverCompact(const uint256& hash, const std::vector<unsigned char>& vchSig);
+    bool RecoverCompact(const uint256& hash, const std::vector<uint8_t> &vchSig);
 
     //! Turn this public key into an uncompressed public key.
     bool Decompress();
@@ -191,8 +198,8 @@ public:
 };
 
 struct CExtPubKey {
-    unsigned char nDepth;
-    unsigned char vchFingerprint[4];
+    uint8_t nDepth;
+    uint8_t vchFingerprint[4];
     unsigned int nChild;
     ChainCode chaincode;
     CPubKey pubkey;
@@ -206,8 +213,8 @@ struct CExtPubKey {
             a.pubkey == b.pubkey;
     }
 
-    void Encode(unsigned char code[BIP32_EXTKEY_SIZE]) const;
-    void Decode(const unsigned char code[BIP32_EXTKEY_SIZE]);
+    void Encode(uint8_t code[BIP32_EXTKEY_SIZE]) const;
+    void Decode(const uint8_t code[BIP32_EXTKEY_SIZE]);
     bool Derive(CExtPubKey& out, unsigned int nChild) const;
 
     void Serialize(CSizeComputer& s) const
@@ -220,7 +227,7 @@ struct CExtPubKey {
     {
         unsigned int len = BIP32_EXTKEY_SIZE;
         ::WriteCompactSize(s, len);
-        unsigned char code[BIP32_EXTKEY_SIZE];
+        uint8_t code[BIP32_EXTKEY_SIZE];
         Encode(code);
         s.write((const char *)&code[0], len);
     }
@@ -228,7 +235,7 @@ struct CExtPubKey {
     void Unserialize(Stream& s)
     {
         unsigned int len = ::ReadCompactSize(s);
-        unsigned char code[BIP32_EXTKEY_SIZE];
+        uint8_t code[BIP32_EXTKEY_SIZE];
         if (len != BIP32_EXTKEY_SIZE)
             throw std::runtime_error("Invalid extended key size\n");
         s.read((char *)&code[0], len);
